@@ -30,11 +30,14 @@ function init()
 function requestListener(request, response)
 {
     var furl = request.url;
+
+    if (furl == "/")
+        furl = "/public/index.html";
     
     fs.readFile(__dirname + furl, (err, data) =>
     {
         console.log(__dirname + furl);
-        response.writeHead(200, {'Content-Type': 'text'});
+        response.writeHead(200, {});
         response.end(data);
     });
 }

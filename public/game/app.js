@@ -2,11 +2,16 @@ var registered = false;
 var registerContainer = $("#registerer");
 var playerNameInput = $("#player-name-input");
 
-var socket, id;
+var socket, id, windowWidth, windowHeight;
 
 var updateIndex = 0;
 
 var players = [];
+var shipTexture;
+
+var playerX, playerY, mouse, mouseWorld;
+
+var control;
 
 window.onload = init;
 
@@ -32,10 +37,18 @@ function init()
     });
 }
 
+function preload()
+{
+    shipTexture = loadImage("/public/content/star-queen.png");
+}
+
 function setup()
 {
-    createCanvas($(window).width() * 0.99, $(window).height() * 0.98);
+    windowWidth = $(window).width() * 0.99;
+    windowHeight = $(window).height() * 0.98;
 
+    createCanvas(windowWidth, windowHeight);
+    control = new Control();
 
 }
 
@@ -43,7 +56,13 @@ function update()
 {
     if(!registered)
         return;
-    if(updateIndex < 1)
+
+    control.update();
+    //update the player's position
+
+
+
+    if(updateIndex < 0)
     {
         updateIndex++;
     }
@@ -51,10 +70,13 @@ function update()
     {
         updateIndex = 0;
         //send update to server
-        socket.emit("update", {x: mouseX, y: mouseY, id: id});
+
+        var dat = control.transformToWorld(createVector(0, 0));
+        
+        socket.emit("update", {x: dat.x, y: dat.y, id: id});
 
         //if(players)
-        //    console.log(players);
+        //    console.log(players[0].color);
     }
 
 }
@@ -65,15 +87,20 @@ function draw()
     update();
     background(0, 150, 200, 255);
 
+    control.draw();
+
+    ellipse(0, 0, 10);
+
     //fill(255, 0, 0);
     //ellipse(mouseX, mouseY, 10);
 
     for(let i = 0; i < players.length; i++)
     {
+        image(shipTexture, players[i].x - 60, players[i].y - 150);
         fill(players[i].color.r, players[i].color.g, players[i].color.b);
-        ellipse(players[i].x, players[i].y, 10);
 
-        text(players[i].name, players[i].x + 15, players[i].y);
+
+        text(players[i].name, players[i].x + 25, players[i].y);
     }
 }
 
@@ -96,4 +123,30 @@ function registerPlayer()
 
     //okay so here we just have to send a message to the server to register our player.
     socket.emit("register", {name: name, id: id});
+}
+
+function keyPressed()
+{
+    control.keyPressed(keyCode);
+    //return false;
+}
+function keyReleased()
+{
+    control.keyReleased(keyCode);
+    return false;
+}
+function mouseWheel(e)
+{
+    control.mouseWheel(e);
+    
+    return {passive:false};
+}
+function mouseClicked()
+{
+    control.mouseClicked();
+}
+function mouseDragged() 
+{
+    control.mouseDragged();
+    return false;
 }
