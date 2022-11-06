@@ -32,11 +32,13 @@ function requestListener(request, response)
     var furl = request.url;
 
     if (furl == "/")
-        furl = "/public/index.html";
+        furl = "/index.html";
     
-    fs.readFile(__dirname + furl, (err, data) =>
+    fs.readFile(__dirname + "/public" + furl, (err, data) =>
     {
-        console.log(__dirname + furl);
+        if(err) console.error(err);
+
+        console.log(__dirname + "/public" + furl);
         response.writeHead(200, {});
         response.end(data);
     });

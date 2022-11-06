@@ -39,7 +39,8 @@ function init()
 
 function preload()
 {
-    shipTexture = loadImage("/public/content/star-queen.png");
+    shipTexture = loadImage("/content/square.png");
+    control = new Control();
 }
 
 function setup()
@@ -48,7 +49,7 @@ function setup()
     windowHeight = $(window).height() * 0.98;
 
     createCanvas(windowWidth, windowHeight);
-    control = new Control();
+
 
 }
 
@@ -96,11 +97,11 @@ function draw()
 
     for(let i = 0; i < players.length; i++)
     {
-        image(shipTexture, players[i].x - 60, players[i].y - 150);
+        image(shipTexture, players[i].x, players[i].y - 30);
         fill(players[i].color.r, players[i].color.g, players[i].color.b);
 
 
-        text(players[i].name, players[i].x + 25, players[i].y);
+        text(players[i].name, players[i].x + 15, players[i].y - 40);
     }
 }
 
